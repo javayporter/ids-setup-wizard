@@ -44,6 +44,9 @@ export async function authenticateDealerController(
   req: Request,
   res: Response,
 ): Promise<void> {
+  // Temporary trace log confirming the request reached the controller.
+  console.log("authenticateDealerController called");
+
   const { clientId } = req.body as { clientId?: string };
 
   try {
@@ -53,11 +56,19 @@ export async function authenticateDealerController(
       success: true,
       data: tokenResponse,
     });
-  } catch (error) {
-    res.status(500).json({
+  } catch (error: unknown) {
+    const appError = error as {
+      statusCode?: number;
+      message?: string;
+      rawResponse?: unknown;
+    };
+
+    const statusCode = appError.statusCode ?? 500;
+
+    res.status(statusCode).json({
       success: false,
-      message: "Unable to authenticate dealer.",
-      error,
+      message: appError.message ?? "Unable to authenticate dealer.",
+      rawResponse: appError.rawResponse ?? null,
     });
   }
 }
