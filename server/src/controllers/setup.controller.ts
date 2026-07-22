@@ -1,4 +1,4 @@
-import type { Request, Response } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { authenticateDealer } from "../services/setupWorkflow.service.js";
 
 /**
@@ -43,6 +43,7 @@ import { authenticateDealer } from "../services/setupWorkflow.service.js";
 export async function authenticateDealerController(
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> {
   // Temporary trace log confirming the request reached the controller.
   console.log("authenticateDealerController called");
@@ -57,18 +58,6 @@ export async function authenticateDealerController(
       data: tokenResponse,
     });
   } catch (error: unknown) {
-    const appError = error as {
-      statusCode?: number;
-      message?: string;
-      rawResponse?: unknown;
-    };
-
-    const statusCode = appError.statusCode ?? 500;
-
-    res.status(statusCode).json({
-      success: false,
-      message: appError.message ?? "Unable to authenticate dealer.",
-      rawResponse: appError.rawResponse ?? null,
-    });
+    next(error);
   }
 }

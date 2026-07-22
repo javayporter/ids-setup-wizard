@@ -1,4 +1,5 @@
 import type { IdsTokenRequest, IdsTokenResponse } from "../types/ids.types.js";
+import { AppError } from "../errors/AppError.js";
 
 // Base URL for the IDS External API.
 // Keeping this in one place makes it easy to change environments later
@@ -56,11 +57,7 @@ export async function getToken(clientId: string): Promise<IdsTokenResponse> {
   if (!response.ok) {
     const errorBody: unknown = await response.json().catch(() => null);
 
-    throw {
-      statusCode: response.status,
-      message: "IDS token request failed.",
-      rawResponse: errorBody,
-    };
+    throw new AppError(response.status, "IDS token request failed.", errorBody);
   }
 
   // Parse the successful IDS response into our strongly typed interface.
