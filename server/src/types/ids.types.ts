@@ -18,5 +18,5 @@ export interface IdsLocationResponse {
   State: string;
   ZipCode: string;
   BusinessPhone: string;
-  MasterLocations: IdsLocationResponse[];
+  MasterLocations: IdsLocationResponse[] | null;
 }

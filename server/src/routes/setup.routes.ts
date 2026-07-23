@@ -1,20 +1,21 @@
 import { Router } from "express";
-import { authenticateDealerController } from "../controllers/setup.controller.js";
+import { startSetupSessionController } from "../controllers/setup.controller.js";
 
 // Create a router dedicated to IDS setup-related endpoints.
 //
 // This router will eventually contain routes for:
-// - dealer authentication
-// - location retrieval
+// - starting a setup session
+// - retrieving or updating session data
+// - password generation
 // - subscription creation
 // - subscription verification
 const setupRouter = Router();
 
 /**
- * POST /api/setup/authenticate
+ * POST /api/setup/start
  *
- * This route receives a Client ID from the frontend and begins
- * the dealer authentication workflow.
+ * This route receives the dealership name and Client ID from the frontend
+ * and begins a new IDS Setup Wizard session.
  *
  * The route itself does not contain business logic.
  * It only connects the URL to the appropriate controller.
@@ -23,18 +24,24 @@ const setupRouter = Router();
  *
  * Frontend
  *   ↓
- * POST /api/setup/authenticate
+ * POST /api/setup/start
  *   ↓
  * setupRouter
  *   ↓
- * authenticateDealerController
+ * startSetupSessionController
  *   ↓
- * setupWorkflow.service.ts
+ * startSetupSession()
  *   ↓
- * ids.service.ts
+ * getToken()
  *   ↓
- * IDS POST /Token
+ * getLocations()
+ *   ↓
+ * identify the main location
+ *   ↓
+ * create and store the setup session
+ *   ↓
+ * return safe session data to the frontend
  */
-setupRouter.post("/authenticate", authenticateDealerController);
+setupRouter.post("/start", startSetupSessionController);
 
 export default setupRouter;

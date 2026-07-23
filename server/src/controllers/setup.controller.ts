@@ -1,61 +1,46 @@
-import type { Request, Response, NextFunction } from "express";
-import { authenticateDealer } from "../services/setupWorkflow.service.js";
+import type { NextFunction, Request, Response } from "express";
+import { startSetupSession } from "../services/setupWorkflow.service.js";
 
 /**
- * Handles requests from the frontend to begin the IDS
- * authentication workflow.
+ * Handles the request that starts a new IDS Setup Wizard session.
  *
- * Why is this endpoint POST?
+ * The frontend sends:
+ * - dealershipName
+ * - clientId
  *
- * Although the workflow eventually requests a token from IDS,
- * the frontend is not asking IDS for a token directly.
+ * The controller:
+ * 1. Reads those values from the HTTP request body.
+ * 2. Calls the workflow service.
+ * 3. Returns the safe setup-session result.
+ * 4. Passes any errors to the global error middleware.
  *
- * The frontend is asking OUR application to perform the
- * "Authenticate Dealer" business action.
+ * The controller does not:
+ * - Call IDS directly
+ * - Retrieve locations itself
+ * - Identify the main location
+ * - Create or store the session itself
  *
- * Flow:
- *
- * React
- *   ↓
- * POST /api/setup/authenticate
- *   ↓
- * Controller
- *   ↓
- * Workflow Service
- *   ↓
- * IDS Service
- *   ↓
- * POST https://.../Token
- *   ↓
- * IDS API
- *
- * Responsibilities:
- * - Read data from the incoming HTTP request.
- * - Call the workflow service.
- * - Return an HTTP response to the frontend.
- *
- * The controller should NOT:
- * - Know how to communicate with IDS.
- * - Contain business logic.
- * - Validate IDS-specific rules.
+ * Those responsibilities belong to the workflow and service layers.
  */
-
-export async function authenticateDealerController(
+export async function startSetupSessionController(
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> {
-  // Temporary trace log confirming the request reached the controller.
-  console.log("authenticateDealerController called");
-
-  const { clientId } = req.body as { clientId?: string };
+  const { dealershipName, clientId } = req.body as {
+    dealershipName?: string;
+    clientId?: string;
+  };
 
   try {
-    const tokenResponse = await authenticateDealer(clientId ?? "");
+    const setupResult = await startSetupSession(
+      dealershipName ?? "",
+      clientId ?? "",
+    );
 
-    res.status(200).json({
+    res.status(201).json({
       success: true,
-      data: tokenResponse,
+      data: setupResult,
     });
   } catch (error: unknown) {
     next(error);
