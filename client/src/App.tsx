@@ -1,65 +1,82 @@
 import { useEffect, useState } from "react";
+
+import DealerInformationPage from "./pages/DealerInformationPage";
 import { getHealthCheck } from "./services/api";
 
+import type { StartSetupResult } from "../../shared/types/api.types";
+
+type ApiStatus = "checking" | "connected" | "disconnected";
+
 function App() {
-  // React state used to display the current API connection status.
-  // The initial value is shown immediately when the component first renders.
-  const [message, setMessage] = useState("Checking API connection...");
+  // Stores the current frontend-to-backend connection state.
+  const [apiStatus, setApiStatus] = useState<ApiStatus>("checking");
 
-  // useEffect runs once after the component is first rendered.
-  // Its job is to verify that the frontend can successfully communicate
-  // with our backend API.
+  // Stores the safe setup data returned after the first wizard step.
+  // When this value exists, we know the setup session was created.
+  const [setupResult, setSetupResult] = useState<StartSetupResult | null>(null);
+
+  // Check the backend connection once when the application loads.
   useEffect(() => {
-    // Async function that calls our backend health endpoint.
-    async function checkApi() {
+    async function checkApiConnection() {
       try {
-        // Calls getHealthCheck() in api.ts.
-        //
-        // Data Flow:
-        // React
-        //   ↓
-        // getHealthCheck()
-        //   ↓
-        // GET http://localhost:3000/api/health
-        //   ↓
-        // Express Backend
-        //   ↓
-        // health.routes.ts
-        //   ↓
-        // JSON Response
-        //   ↓
-        // Back to React
-        const response = await getHealthCheck();
-
-        // Update React state with the message returned by the backend.
-        // Calling setMessage() tells React that the state has changed,
-        // causing the component to automatically render again with the
-        // new message.
-        setMessage(response.message);
+        await getHealthCheck();
+        setApiStatus("connected");
       } catch {
-        // If anything fails (backend isn't running, network issue, etc.),
-        // display a user-friendly message instead.
-        setMessage("Unable to connect to the backend.");
+        setApiStatus("disconnected");
       }
     }
 
-    // Execute the API call.
-    checkApi();
-
-    // Empty dependency array means:
-    // Run this effect only once when the component first mounts.
+    checkApiConnection();
   }, []);
 
-  // Render the current message stored in React state.
-  // Initially:
-  //   "Checking API connection..."
-  //
-  // After a successful API call:
-  //   "IDS Setup Wizard API is running"
-  //
-  // If the request fails:
-  //   "Unable to connect to the backend."
-  return <h1>{message}</h1>;
+  // Temporary next-screen placeholder.
+  // Later this will become the real Dealer Locations page.
+  if (setupResult) {
+    return (
+      <main>
+        <h1>Locations retrieved</h1>
+
+        <p>Dealership: {setupResult.dealershipName}</p>
+        <p>Main location: {setupResult.mainLocation.Name}</p>
+        <p>Location code: {setupResult.mainLocation.Location}</p>
+        <p>Total locations: {setupResult.locations.length}</p>
+      </main>
+    );
+  }
+
+  return (
+    <>
+      {/* 
+        Show connection information only during development.
+        Vite replaces import.meta.env.DEV with true during local development
+        and false in a production build.
+      */}
+      {import.meta.env.DEV && (
+        <div
+          style={{
+            padding: "8px 16px",
+            fontFamily: "Arial, sans-serif",
+            fontSize: "14px",
+            backgroundColor:
+              apiStatus === "connected"
+                ? "#dcfce7"
+                : apiStatus === "disconnected"
+                  ? "#fee2e2"
+                  : "#fef3c7",
+          }}
+        >
+          {apiStatus === "checking" && "Checking API connection..."}
+
+          {apiStatus === "connected" && "Backend API connected"}
+
+          {apiStatus === "disconnected" &&
+            "Unable to connect to the backend API"}
+        </div>
+      )}
+
+      <DealerInformationPage onSetupStarted={setSetupResult} />
+    </>
+  );
 }
 
 export default App;
