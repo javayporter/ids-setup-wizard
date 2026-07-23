@@ -1,4 +1,8 @@
-import type { IdsTokenRequest, IdsTokenResponse } from "../types/ids.types.js";
+import type {
+  IdsTokenRequest,
+  IdsTokenResponse,
+  IdsLocationResponse,
+} from "../types/ids.types.js";
 import { AppError } from "../errors/AppError.js";
 
 // Base URL for the IDS External API.
@@ -64,5 +68,41 @@ export async function getToken(clientId: string): Promise<IdsTokenResponse> {
   const data = (await response.json()) as IdsTokenResponse;
 
   // Return the token information back to whoever called this service.
+  return data;
+}
+
+export async function getLocations(
+  accessToken: string,
+): Promise<IdsLocationResponse[]> {
+  // Send the GET request to IDS.
+  const response = await fetch(`${IDS_BASE_URL}/Locations`, {
+    method: "GET",
+
+    // Tell IDS we're sending JSON.
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  // If IDS returns anything other than a successful response,
+  // preserve as much information as possible.
+  //
+  // The frontend support team currently relies on the helpful
+  // IDS error messages shown in Postman. We want to preserve
+  // those rather than replacing them with a generic error.
+  if (!response.ok) {
+    const errorBody: unknown = await response.json().catch(() => null);
+
+    throw new AppError(
+      response.status,
+      "IDS locations request failed.",
+      errorBody,
+    );
+  }
+
+  // Parse the successful IDS response into our strongly typed interface.
+  const data = (await response.json()) as IdsLocationResponse[];
+
+  // Return the all locations back to whoever called this service.
   return data;
 }
