@@ -20,6 +20,7 @@ export interface SetupSession {
   expiresInSeconds: number;
   mainLocation: IdsLocationResponse;
   locations: IdsLocationResponse[];
+  generatedPassword: string | null;
 }
 
 export interface StartSetupResult {

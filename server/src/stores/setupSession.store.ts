@@ -16,18 +16,18 @@ import type { CreateSetupSession, SetupSession } from "../types/setup.types.js";
  *
  * Think of this as the application's short-term memory.
  *
- * During the setup process we don't want to repeatedly ask IDS
+ * During the setup process, we don't want to repeatedly ask IDS
  * for a new token or re-fetch locations every time the user clicks
  * "Next".
  *
- * Instead we create a session once and remember everything the
+ * Instead, we create a session once and remember everything the
  * workflow needs until setup is complete.
  *
  * Responsibilities:
  * -----------------
  * ✔ Create sessions
  * ✔ Retrieve sessions
- * ✔ Update sessions (later)
+ * ✔ Update sessions
  * ✔ Delete sessions
  *
  * This file DOES NOT:
@@ -41,25 +41,23 @@ import type { CreateSetupSession, SetupSession } from "../types/setup.types.js";
  */
 
 /**
- * The in-memory session store.
+ * Fields that may be changed after a session has been created.
  *
- * Think of a Map like a dictionary.
+ * sessionId and createdAt are intentionally excluded because they identify
+ * when and how the session was originally created and should remain stable.
+ */
+type SetupSessionUpdates = Partial<
+  Omit<SetupSession, "sessionId" | "createdAt">
+>;
+
+/**
+ * The in-memory session store.
  *
  * Key:
  *   sessionId
  *
  * Value:
  *   SetupSession
- *
- * Example:
- *
- * "abc123"
- *      ↓
- * {
- *    dealershipName: "...",
- *    accessToken: "...",
- *    locations: [...]
- * }
  *
  * NOTE:
  * -----
@@ -75,24 +73,19 @@ const sessions = new Map<string, SetupSession>();
 /**
  * Creates a brand-new setup session.
  *
- * Why generate the session ID here?
- *
- * Because the store owns session creation.
- * Nobody else should need to know HOW session IDs
- * are created.
+ * The store owns session creation, including generating the session ID
+ * and recording when the session was created.
  */
 export function createSession(sessionData: CreateSetupSession): SetupSession {
-  // Generate a unique session identifier.
   const sessionId = randomUUID();
 
-  // Build the complete session object.
   const session: SetupSession = {
     sessionId,
     createdAt: new Date(),
+    generatedPassword: null,
     ...sessionData,
   };
 
-  // Store it in memory.
   sessions.set(sessionId, session);
 
   return session;
@@ -101,10 +94,8 @@ export function createSession(sessionData: CreateSetupSession): SetupSession {
 /**
  * Retrieves a previously created session.
  *
- * Throws an AppError if the session does not exist.
- *
- * This prevents the workflow from continuing with an
- * invalid or expired session.
+ * Throws an AppError if the session does not exist. This prevents the
+ * workflow from continuing with an invalid or expired session.
  */
 export function getSession(sessionId: string): SetupSession {
   const session = sessions.get(sessionId);
@@ -117,10 +108,36 @@ export function getSession(sessionId: string): SetupSession {
 }
 
 /**
+ * Updates an existing setup session.
+ *
+ * The workflow layer decides which values should change. The store is only
+ * responsible for retrieving the current session, applying the updates,
+ * and saving the updated session.
+ *
+ * Immutable session fields such as sessionId and createdAt cannot be changed
+ * through this function.
+ */
+export function updateSession(
+  sessionId: string,
+  updates: SetupSessionUpdates,
+): SetupSession {
+  const currentSession = getSession(sessionId);
+
+  const updatedSession: SetupSession = {
+    ...currentSession,
+    ...updates,
+  };
+
+  sessions.set(sessionId, updatedSession);
+
+  return updatedSession;
+}
+
+/**
  * Deletes a completed or abandoned setup session.
  *
- * Once setup is complete we no longer need to keep
- * sensitive information such as the access token in memory.
+ * Once setup is complete, we no longer need to keep sensitive information
+ * such as the IDS access token or generated password in memory.
  */
 export function deleteSession(sessionId: string): void {
   sessions.delete(sessionId);

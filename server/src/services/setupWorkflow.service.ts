@@ -1,10 +1,22 @@
 import { AppError } from "../errors/AppError.js";
 
-import { createSession } from "../stores/setupSession.store.js";
+import { createSession, updateSession } from "../stores/setupSession.store.js";
 
 import type { StartSetupResult } from "../types/setup.types.js";
 
+import { generateCredentialPassword } from "../utils/credential.util.js";
+
 import { getLocations, getToken } from "./ids.service.js";
+
+/**
+ * Safe result returned after credentials are generated.
+ *
+ * The complete backend session is not returned because it contains
+ * sensitive values such as the IDS access token and Client ID.
+ */
+interface GenerateCredentialsResult {
+  generatedPassword: string;
+}
 
 /**
  * Starts a new IDS Setup Wizard session.
@@ -108,5 +120,41 @@ export async function startSetupSession(
     dealershipName: session.dealershipName,
     mainLocation: session.mainLocation,
     locations: session.locations,
+  };
+}
+
+/**
+ * Generates the password used to connect the iCC feed with IDS.
+ *
+ * Workflow:
+ *
+ * Session ID
+ *      ↓
+ * Generate a secure 16-character alphanumeric password
+ *      ↓
+ * Store the password in the existing backend session
+ *      ↓
+ * Return only the generated password to the frontend
+ *
+ * updateSession() also validates that the session exists. If the session
+ * cannot be found, the store throws the appropriate AppError.
+ */
+export function generateSetupCredentials(
+  sessionId: string,
+): GenerateCredentialsResult {
+  const trimmedSessionId = sessionId.trim();
+
+  if (!trimmedSessionId) {
+    throw new AppError(400, "Setup session ID is required.");
+  }
+
+  const generatedPassword = generateCredentialPassword();
+
+  updateSession(trimmedSessionId, {
+    generatedPassword,
+  });
+
+  return {
+    generatedPassword,
   };
 }

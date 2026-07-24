@@ -1,12 +1,16 @@
 import { Router } from "express";
-import { startSetupSessionController } from "../controllers/setup.controller.js";
+
+import {
+  generateSetupCredentialsController,
+  startSetupSessionController,
+} from "../controllers/setup.controller.js";
 
 // Create a router dedicated to IDS setup-related endpoints.
 //
 // This router will eventually contain routes for:
 // - starting a setup session
 // - retrieving or updating session data
-// - password generation
+// - credential generation
 // - subscription creation
 // - subscription verification
 const setupRouter = Router();
@@ -14,34 +18,63 @@ const setupRouter = Router();
 /**
  * POST /api/setup/start
  *
- * This route receives the dealership name and Client ID from the frontend
- * and begins a new IDS Setup Wizard session.
+ * Begins a brand-new IDS Setup Wizard session.
  *
- * The route itself does not contain business logic.
- * It only connects the URL to the appropriate controller.
+ * The frontend provides:
+ * - dealership name
+ * - IDS Client ID
  *
- * Full request flow:
+ * The workflow:
  *
  * Frontend
  *   ↓
  * POST /api/setup/start
  *   ↓
- * setupRouter
- *   ↓
  * startSetupSessionController
  *   ↓
  * startSetupSession()
  *   ↓
- * getToken()
+ * Authenticate with IDS
  *   ↓
- * getLocations()
+ * Retrieve dealer locations
  *   ↓
- * identify the main location
+ * Identify the main location
  *   ↓
- * create and store the setup session
+ * Create a backend setup session
  *   ↓
- * return safe session data to the frontend
+ * Return safe session data
  */
 setupRouter.post("/start", startSetupSessionController);
+
+/**
+ * POST /api/setup/:sessionId/generate-credentials
+ *
+ * Generates the credentials needed for the iCC inventory feed.
+ *
+ * The setup session already contains the authenticated IDS context.
+ * This endpoint generates a secure password, stores it in the backend
+ * session, and returns only the generated credential required by the
+ * frontend.
+ *
+ * Workflow:
+ *
+ * Frontend
+ *   ↓
+ * POST /api/setup/{sessionId}/generate-credentials
+ *   ↓
+ * generateSetupCredentialsController
+ *   ↓
+ * generateSetupCredentials()
+ *   ↓
+ * Generate secure password
+ *   ↓
+ * Update backend session
+ *   ↓
+ * Return generated password
+ */
+setupRouter.post(
+  "/:sessionId/generate-credentials",
+  generateSetupCredentialsController,
+);
 
 export default setupRouter;

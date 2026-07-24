@@ -39,3 +39,12 @@ export interface StartSetupResponse {
   success: boolean;
   data: StartSetupResult;
 }
+
+export interface GenerateSetupCredentialsResult {
+  generatedPassword: string;
+}
+
+export interface GenerateSetupCredentialsResponse {
+  success: boolean;
+  data: GenerateSetupCredentialsResult;
+}

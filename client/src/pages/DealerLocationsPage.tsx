@@ -5,6 +5,7 @@ interface DealerLocationsPageProps {
   mainLocation: IdsLocation;
   locations: IdsLocation[];
   onBack: () => void;
+  onContinue: () => void;
 }
 
 export default function DealerLocationsPage({
@@ -12,6 +13,7 @@ export default function DealerLocationsPage({
   mainLocation,
   locations,
   onBack,
+  onContinue,
 }: DealerLocationsPageProps) {
   return (
     <main
@@ -86,6 +88,9 @@ export default function DealerLocationsPage({
           }}
         >
           Back
+        </button>
+        <button type="button" onClick={onContinue}>
+          Continue
         </button>
       </section>
     </main>

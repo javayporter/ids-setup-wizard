@@ -1,5 +1,6 @@
 import DealerInformationPage from "../../pages/DealerInformationPage";
 import DealerLocationsPage from "../../pages/DealerLocationsPage";
+import IccFeedSetupPage from "../../pages/IccFeedSetupPage";
 import { useSetupWizard } from "../../hooks/useSetupWizard";
 
 /**
@@ -9,21 +10,21 @@ import { useSetupWizard } from "../../hooks/useSetupWizard";
  * passes each page only the state and callbacks it needs.
  */
 export default function SetupWizard() {
-  const { wizardState, handleSetupStarted, goBackToDealerInformation } =
-    useSetupWizard();
+  const {
+    wizardState,
+    handleSetupStarted,
+    goBackToDealerInformation,
+    continueToIccFeedSetup,
+    goBackToDealerLocations,
+    regeneratePassword,
+    handleFeedCreated,
+  } = useSetupWizard();
 
   switch (wizardState.currentStep) {
     case "dealer-information":
       return <DealerInformationPage onSetupStarted={handleSetupStarted} />;
 
     case "dealer-locations":
-      /**
-       * TypeScript knows these values may initially be null because no setup
-       * session exists when the application first loads.
-       *
-       * Reaching this page without a main location would represent invalid
-       * wizard state, so we guard against it before rendering the page.
-       */
       if (!wizardState.mainLocation) {
         return (
           <main>
@@ -39,6 +40,31 @@ export default function SetupWizard() {
           mainLocation={wizardState.mainLocation}
           locations={wizardState.locations}
           onBack={goBackToDealerInformation}
+          onContinue={continueToIccFeedSetup}
+        />
+      );
+
+    case "icc-feed-setup":
+      if (!wizardState.mainLocation || !wizardState.generatedPassword) {
+        return (
+          <main>
+            <h1>Unable to display feed credentials.</h1>
+            <p>Please return to the previous step and try again.</p>
+
+            <button type="button" onClick={goBackToDealerLocations}>
+              Back
+            </button>
+          </main>
+        );
+      }
+
+      return (
+        <IccFeedSetupPage
+          mainLocationCode={wizardState.mainLocation.Location}
+          generatedPassword={wizardState.generatedPassword}
+          onBack={goBackToDealerLocations}
+          onRegeneratePassword={regeneratePassword}
+          onFeedCreated={handleFeedCreated}
         />
       );
 

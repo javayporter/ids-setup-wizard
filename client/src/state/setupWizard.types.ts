@@ -6,7 +6,10 @@ import type { IdsLocation } from "../../../shared/types/api.types";
  * We use descriptive string values instead of step numbers so the code
  * communicates what each step represents.
  */
-export type SetupWizardStep = "dealer-information" | "dealer-locations";
+export type SetupWizardStep =
+  | "dealer-information"
+  | "dealer-locations"
+  | "icc-feed-setup";
 
 /**
  * Represents the safe setup information the React application must retain
@@ -21,4 +24,5 @@ export interface SetupWizardState {
   dealershipName: string;
   mainLocation: IdsLocation | null;
   locations: IdsLocation[];
+  generatedPassword: string | null;
 }
