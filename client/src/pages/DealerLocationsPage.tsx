@@ -1,3 +1,5 @@
+import WizardLayout from "../components/WizardLayout";
+
 import type { IdsLocation } from "../../../shared/types/api.types";
 
 interface DealerLocationsPageProps {
@@ -16,69 +18,57 @@ export default function DealerLocationsPage({
   onContinue,
 }: DealerLocationsPageProps) {
   return (
-    <main
-      style={{
-        minHeight: "100vh",
-        display: "grid",
-        placeItems: "center",
-        padding: "24px",
-        backgroundColor: "#f5f7fa",
-        fontFamily: "Arial, sans-serif",
-      }}
+    <WizardLayout
+      stepLabel="Step 2"
+      title="Confirm Dealer Locations"
+      description={
+        <>
+          IDS returned the following location information for{" "}
+          <strong>{dealershipName}</strong>.
+        </>
+      }
+      maxWidth="620px"
     >
       <section
         style={{
-          width: "100%",
-          maxWidth: "620px",
-          padding: "32px",
-          borderRadius: "12px",
-          backgroundColor: "#ffffff",
-          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
+          padding: "16px",
+          border: "1px solid #cbd5e1",
+          borderRadius: "8px",
         }}
       >
-        <p style={{ margin: "0 0 8px", fontWeight: 600 }}>Step 2</p>
+        <h2 style={{ marginTop: 0, fontSize: "18px" }}>Main location</h2>
 
-        <h1 style={{ margin: "0 0 12px" }}>Confirm Dealer Locations</h1>
-
-        <p style={{ lineHeight: 1.5 }}>
-          IDS returned the following location information for{" "}
-          <strong>{dealershipName}</strong>.
+        <p>
+          <strong>Name:</strong> {mainLocation.Name}
         </p>
 
-        <section
-          style={{
-            marginTop: "24px",
-            padding: "16px",
-            border: "1px solid #cbd5e1",
-            borderRadius: "8px",
-          }}
-        >
-          <h2 style={{ marginTop: 0, fontSize: "18px" }}>Main location</h2>
+        <p>
+          <strong>Location code:</strong> {mainLocation.Location}
+        </p>
+      </section>
 
-          <p>
-            <strong>Name:</strong> {mainLocation.Name}
-          </p>
+      <h2 style={{ marginTop: "28px", fontSize: "20px" }}>All locations</h2>
 
-          <p>
-            <strong>Location code:</strong> {mainLocation.Location}
-          </p>
-        </section>
+      <ul>
+        {locations.map((location) => (
+          <li key={location.Location}>
+            {location.Name} ({location.Location})
+          </li>
+        ))}
+      </ul>
 
-        <h2 style={{ marginTop: "28px", fontSize: "20px" }}>All locations</h2>
-
-        <ul>
-          {locations.map((location) => (
-            <li key={location.Location}>
-              {location.Name} ({location.Location})
-            </li>
-          ))}
-        </ul>
-
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          gap: "16px",
+          marginTop: "24px",
+        }}
+      >
         <button
           type="button"
           onClick={onBack}
           style={{
-            marginTop: "24px",
             padding: "12px 18px",
             border: "1px solid #64748b",
             borderRadius: "8px",
@@ -89,10 +79,23 @@ export default function DealerLocationsPage({
         >
           Back
         </button>
-        <button type="button" onClick={onContinue}>
+
+        <button
+          type="button"
+          onClick={onContinue}
+          style={{
+            padding: "12px 18px",
+            border: "none",
+            borderRadius: "8px",
+            backgroundColor: "#2563eb",
+            color: "#ffffff",
+            fontWeight: 600,
+            cursor: "pointer",
+          }}
+        >
           Continue
         </button>
-      </section>
-    </main>
+      </div>
+    </WizardLayout>
   );
 }

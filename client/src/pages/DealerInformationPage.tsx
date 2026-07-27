@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import WizardLayout from "../components/WizardLayout";
 import { startSetup } from "../services/api";
 
 import type { StartSetupResult } from "../../../shared/types/api.types";
@@ -71,109 +72,75 @@ export default function DealerInformationPage({
   const isFormIncomplete = !dealershipName.trim() || !clientId.trim();
 
   return (
-    <main style={styles.page}>
-      <section style={styles.card}>
-        <p style={styles.stepLabel}>Step 1 of 8</p>
+    <WizardLayout
+      stepLabel="Step 1 of 8"
+      title="Start IDS Setup"
+      description="Enter the dealership information provided for this IDS integration."
+      maxWidth="520px"
+    >
+      <form onSubmit={handleSubmit} style={styles.form}>
+        <div style={styles.fieldGroup}>
+          <label htmlFor="dealershipName" style={styles.label}>
+            Dealership name
+          </label>
 
-        <h1 style={styles.heading}>Start IDS Setup</h1>
+          <input
+            id="dealershipName"
+            type="text"
+            value={dealershipName}
+            onChange={(event) => setDealershipName(event.target.value)}
+            placeholder="Southwind RV"
+            autoComplete="organization"
+            disabled={isLoading}
+            style={styles.input}
+          />
+        </div>
 
-        <p style={styles.description}>
-          Enter the dealership information provided for this IDS integration.
-        </p>
+        <div style={styles.fieldGroup}>
+          <label htmlFor="clientId" style={styles.label}>
+            IDS Client ID
+          </label>
 
-        <form onSubmit={handleSubmit} style={styles.form}>
-          <div style={styles.fieldGroup}>
-            <label htmlFor="dealershipName" style={styles.label}>
-              Dealership name
-            </label>
+          <input
+            id="clientId"
+            type="password"
+            value={clientId}
+            onChange={(event) => setClientId(event.target.value)}
+            placeholder="Enter the IDS Client ID"
+            autoComplete="off"
+            disabled={isLoading}
+            style={styles.input}
+          />
 
-            <input
-              id="dealershipName"
-              type="text"
-              value={dealershipName}
-              onChange={(event) => setDealershipName(event.target.value)}
-              placeholder="Southwind RV"
-              autoComplete="organization"
-              disabled={isLoading}
-              style={styles.input}
-            />
+          <small style={styles.helpText}>
+            The Client ID is sent securely to the backend and is not displayed
+            after setup begins.
+          </small>
+        </div>
+
+        {errorMessage && (
+          <div role="alert" style={styles.error}>
+            {errorMessage}
           </div>
+        )}
 
-          <div style={styles.fieldGroup}>
-            <label htmlFor="clientId" style={styles.label}>
-              IDS Client ID
-            </label>
-
-            <input
-              id="clientId"
-              type="password"
-              value={clientId}
-              onChange={(event) => setClientId(event.target.value)}
-              placeholder="Enter the IDS Client ID"
-              autoComplete="off"
-              disabled={isLoading}
-              style={styles.input}
-            />
-
-            <small style={styles.helpText}>
-              The Client ID is sent securely to the backend and is not displayed
-              after setup begins.
-            </small>
-          </div>
-
-          {errorMessage && (
-            <div role="alert" style={styles.error}>
-              {errorMessage}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isLoading || isFormIncomplete}
-            style={{
-              ...styles.button,
-              opacity: isLoading || isFormIncomplete ? 0.6 : 1,
-              cursor: isLoading || isFormIncomplete ? "not-allowed" : "pointer",
-            }}
-          >
-            {isLoading ? "Starting setup..." : "Next: Retrieve Locations"}
-          </button>
-        </form>
-      </section>
-    </main>
+        <button
+          type="submit"
+          disabled={isLoading || isFormIncomplete}
+          style={{
+            ...styles.button,
+            opacity: isLoading || isFormIncomplete ? 0.6 : 1,
+            cursor: isLoading || isFormIncomplete ? "not-allowed" : "pointer",
+          }}
+        >
+          {isLoading ? "Starting setup..." : "Next: Retrieve Locations"}
+        </button>
+      </form>
+    </WizardLayout>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    display: "grid",
-    placeItems: "center",
-    padding: "24px",
-    backgroundColor: "#f5f7fa",
-    fontFamily: "Arial, sans-serif",
-  },
-  card: {
-    width: "100%",
-    maxWidth: "520px",
-    padding: "32px",
-    borderRadius: "12px",
-    backgroundColor: "#ffffff",
-    boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
-  },
-  stepLabel: {
-    margin: "0 0 8px",
-    fontSize: "14px",
-    fontWeight: 600,
-  },
-  heading: {
-    margin: "0 0 12px",
-    fontSize: "30px",
-  },
-  description: {
-    margin: "0 0 28px",
-    lineHeight: 1.5,
-  },
   form: {
     display: "grid",
     gap: "20px",
