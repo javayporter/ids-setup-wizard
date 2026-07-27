@@ -80,19 +80,25 @@ export function useSetupWizard() {
   }
 
   /**
-   * Requests a generated password from the backend and advances to the
-   * iCC feed setup page after the request succeeds.
+   * Requests a generated password from the backend and stores it in the
+   * wizard state.
    *
-   * The backend remains the source of truth for the generated password.
+   * This helper owns the shared credential request lifecycle used by both
+   * the initial credential generation and password regeneration flows.
+   *
+   * Navigation remains the responsibility of the calling workflow action.
    */
-  async function continueToIccFeedSetup(): Promise<void> {
+  async function requestGeneratedPassword(
+    errorMessage: string,
+  ): Promise<boolean> {
     const sessionId = wizardState.sessionId;
 
     if (!sessionId) {
       setCredentialError(
         "The setup session is unavailable. Please restart the setup process.",
       );
-      return;
+
+      return false;
     }
 
     setIsGeneratingCredentials(true);
@@ -103,15 +109,30 @@ export function useSetupWizard() {
 
       setWizardState((currentState) => ({
         ...currentState,
-        currentStep: "icc-feed-setup",
         generatedPassword: response.data.generatedPassword,
       }));
+
+      return true;
     } catch {
-      setCredentialError(
-        "Unable to generate the feed credentials. Please try again.",
-      );
+      setCredentialError(errorMessage);
+
+      return false;
     } finally {
       setIsGeneratingCredentials(false);
+    }
+  }
+
+  /**
+   * Requests the initial generated password and advances to the iCC feed
+   * setup page after the request succeeds.
+   */
+  async function continueToIccFeedSetup(): Promise<void> {
+    const wasPasswordGenerated = await requestGeneratedPassword(
+      "Unable to generate the feed credentials. Please try again.",
+    );
+
+    if (wasPasswordGenerated) {
+      goToStep("icc-feed-setup");
     }
   }
 
@@ -129,36 +150,13 @@ export function useSetupWizard() {
   /**
    * Requests a replacement password from the backend.
    *
-   * The backend updates the existing setup session and returns the newly
-   * generated password.
+   * The user remains on the iCC feed setup page while the password stored
+   * in the current setup session is replaced.
    */
   async function regeneratePassword(): Promise<void> {
-    const sessionId = wizardState.sessionId;
-
-    if (!sessionId) {
-      setCredentialError(
-        "The setup session is unavailable. Please restart the setup process.",
-      );
-      return;
-    }
-
-    setIsGeneratingCredentials(true);
-    setCredentialError(null);
-
-    try {
-      const response = await generateSetupCredentials(sessionId);
-
-      setWizardState((currentState) => ({
-        ...currentState,
-        generatedPassword: response.data.generatedPassword,
-      }));
-    } catch {
-      setCredentialError(
-        "Unable to generate a new password. Please try again.",
-      );
-    } finally {
-      setIsGeneratingCredentials(false);
-    }
+    await requestGeneratedPassword(
+      "Unable to generate a new password. Please try again.",
+    );
   }
 
   /**
