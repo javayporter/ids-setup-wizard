@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import type { StartSetupResult } from "../../../shared/types/api.types";
+import { ApiError } from "../errors/ApiError";
 import { generateSetupCredentials } from "../services/api";
 import type {
   SetupWizardState,
@@ -89,7 +90,7 @@ export function useSetupWizard() {
    * Navigation remains the responsibility of the calling workflow action.
    */
   async function requestGeneratedPassword(
-    errorMessage: string,
+    fallbackErrorMessage: string,
   ): Promise<boolean> {
     const sessionId = wizardState.sessionId;
 
@@ -113,8 +114,16 @@ export function useSetupWizard() {
       }));
 
       return true;
-    } catch {
-      setCredentialError(errorMessage);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        console.error("Credential API request failed:", error);
+
+        setCredentialError(error.message);
+      } else {
+        console.error("Unexpected credential request error:", error);
+
+        setCredentialError(fallbackErrorMessage);
+      }
 
       return false;
     } finally {
