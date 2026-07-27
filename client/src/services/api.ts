@@ -15,7 +15,14 @@ import type {
  * can reuse it. Later we'll likely move this into an
  * environment variable for different environments.
  */
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+// Throw an error if the base URL is not configured. (Failing fast is better than failing silently.)
+if (!API_BASE_URL) {
+  throw new Error(
+    "VITE_API_BASE_URL is not configured. Create client/.env.local (or update it) and define VITE_API_BASE_URL.",
+  );
+}
 
 /**
  * Checks whether the backend API is running.
