@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { PrimaryButton, SecondaryButton } from "../components/Button";
 import WizardLayout from "../components/WizardLayout";
 
 interface IccFeedSetupPageProps {
@@ -59,42 +60,19 @@ export default function IccFeedSetupPage({
       description="Use the information below to create the dealer's IDS API inventory feed in iCC."
       maxWidth="700px"
     >
-      <section
-        style={{
-          padding: "20px",
-          border: "1px solid #cbd5e1",
-          borderRadius: "8px",
-          backgroundColor: "#f8fafc",
-        }}
-      >
-        <h2 style={{ marginTop: 0, fontSize: "20px" }}>Feed Information</h2>
+      <section style={styles.feedInformationCard}>
+        <h2 style={styles.sectionHeading}>Feed Information</h2>
 
-        <div style={{ marginTop: "20px" }}>
-          <p
-            style={{
-              marginBottom: "6px",
-              fontSize: "14px",
-              fontWeight: 600,
-            }}
-          >
-            IDS Client ID
-          </p>
+        <div style={styles.fieldSection}>
+          <p style={styles.fieldLabel}>IDS Client ID</p>
 
-          <p style={{ marginTop: 0 }}>
+          <p style={styles.fieldDescription}>
             Use the Client ID entered during Step 1.
           </p>
         </div>
 
-        <div style={{ marginTop: "20px" }}>
-          <label
-            htmlFor="main-location-code"
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              fontSize: "14px",
-              fontWeight: 600,
-            }}
-          >
+        <div style={styles.fieldSection}>
+          <label htmlFor="main-location-code" style={styles.inputLabel}>
             Master Location Code
           </label>
 
@@ -103,28 +81,12 @@ export default function IccFeedSetupPage({
             type="text"
             value={mainLocationCode}
             readOnly
-            style={{
-              width: "100%",
-              boxSizing: "border-box",
-              padding: "12px",
-              border: "1px solid #94a3b8",
-              borderRadius: "8px",
-              backgroundColor: "#ffffff",
-              fontSize: "16px",
-            }}
+            style={styles.input}
           />
         </div>
 
-        <div style={{ marginTop: "20px" }}>
-          <label
-            htmlFor="generated-password"
-            style={{
-              display: "block",
-              marginBottom: "6px",
-              fontSize: "14px",
-              fontWeight: 600,
-            }}
-          >
+        <div style={styles.fieldSection}>
+          <label htmlFor="generated-password" style={styles.inputLabel}>
             Generated Password
           </label>
 
@@ -134,119 +96,64 @@ export default function IccFeedSetupPage({
             value={generatedPassword}
             readOnly
             style={{
-              width: "100%",
-              boxSizing: "border-box",
-              padding: "12px",
-              border: "1px solid #94a3b8",
-              borderRadius: "8px",
-              backgroundColor: "#ffffff",
+              ...styles.input,
               fontFamily: "monospace",
-              fontSize: "16px",
               letterSpacing: "1px",
             }}
           />
 
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "10px",
-              marginTop: "12px",
-            }}
-          >
-            <button
+          <div style={styles.passwordButtonRow}>
+            <SecondaryButton
               type="button"
-              onClick={() => setIsPasswordVisible((current) => !current)}
+              onClick={() =>
+                setIsPasswordVisible((currentValue) => !currentValue)
+              }
               disabled={isRegeneratingPassword}
-              style={{
-                padding: "10px 14px",
-                border: "1px solid #64748b",
-                borderRadius: "8px",
-                backgroundColor: "#ffffff",
-                fontWeight: 600,
-                cursor: isRegeneratingPassword ? "not-allowed" : "pointer",
-                opacity: isRegeneratingPassword ? 0.6 : 1,
-              }}
+              style={styles.compactButton}
             >
               {isPasswordVisible ? "Hide Password" : "Show Password"}
-            </button>
+            </SecondaryButton>
 
-            <button
+            <SecondaryButton
               type="button"
               onClick={handleCopyPassword}
               disabled={isRegeneratingPassword}
-              style={{
-                padding: "10px 14px",
-                border: "1px solid #64748b",
-                borderRadius: "8px",
-                backgroundColor: "#ffffff",
-                fontWeight: 600,
-                cursor: isRegeneratingPassword ? "not-allowed" : "pointer",
-                opacity: isRegeneratingPassword ? 0.6 : 1,
-              }}
+              style={styles.compactButton}
             >
               Copy Password
-            </button>
+            </SecondaryButton>
 
-            <button
+            <SecondaryButton
               type="button"
               onClick={handleRegeneratePassword}
               disabled={isRegeneratingPassword}
-              style={{
-                padding: "10px 14px",
-                border: "1px solid #64748b",
-                borderRadius: "8px",
-                backgroundColor: "#ffffff",
-                fontWeight: 600,
-                cursor: isRegeneratingPassword ? "not-allowed" : "pointer",
-                opacity: isRegeneratingPassword ? 0.6 : 1,
-              }}
+              aria-busy={isRegeneratingPassword}
+              style={styles.compactButton}
             >
               {isRegeneratingPassword
                 ? "Generating..."
                 : "Generate New Password"}
-            </button>
+            </SecondaryButton>
           </div>
 
           {copyMessage && (
-            <p
-              role="status"
-              style={{
-                marginBottom: 0,
-                color: "#334155",
-                fontSize: "14px",
-              }}
-            >
+            <p role="status" style={styles.statusMessage}>
               {copyMessage}
             </p>
           )}
 
           {regenerateError && (
-            <p
-              role="alert"
-              style={{
-                marginBottom: 0,
-                color: "#b91c1c",
-                fontSize: "14px",
-              }}
-            >
+            <p role="alert" style={styles.errorMessage}>
               {regenerateError}
             </p>
           )}
         </div>
       </section>
 
-      <section
-        style={{
-          marginTop: "24px",
-          padding: "20px",
-          border: "1px solid #cbd5e1",
-          borderRadius: "8px",
-        }}
-      >
-        <h2 style={{ marginTop: 0, fontSize: "20px" }}>iCC Instructions</h2>
+      <section style={styles.instructionsCard}>
+        <h2 style={styles.sectionHeading}>iCC Instructions</h2>
 
-        <ol style={{ paddingLeft: "22px", lineHeight: 1.7 }}>
+        <ol style={styles.instructionsList}>
           <li>Open the dealer account in iCC.</li>
           <li>Create a new IDS API inventory import feed.</li>
           <li>Enter the IDS Client ID used during Step 1.</li>
@@ -259,49 +166,97 @@ export default function IccFeedSetupPage({
         </ol>
       </section>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "16px",
-          marginTop: "32px",
-        }}
-      >
-        <button
+      <div style={styles.navigationButtonRow}>
+        <SecondaryButton
           type="button"
           onClick={onBack}
           disabled={isRegeneratingPassword}
-          style={{
-            padding: "12px 18px",
-            border: "1px solid #64748b",
-            borderRadius: "8px",
-            backgroundColor: "#ffffff",
-            fontWeight: 600,
-            cursor: isRegeneratingPassword ? "not-allowed" : "pointer",
-            opacity: isRegeneratingPassword ? 0.6 : 1,
-          }}
         >
           Back
-        </button>
+        </SecondaryButton>
 
-        <button
+        <PrimaryButton
           type="button"
           onClick={onFeedCreated}
           disabled={isRegeneratingPassword}
-          style={{
-            padding: "12px 18px",
-            border: "none",
-            borderRadius: "8px",
-            backgroundColor: "#2563eb",
-            color: "#ffffff",
-            fontWeight: 600,
-            cursor: isRegeneratingPassword ? "not-allowed" : "pointer",
-            opacity: isRegeneratingPassword ? 0.6 : 1,
-          }}
         >
           Feed Created
-        </button>
+        </PrimaryButton>
       </div>
     </WizardLayout>
   );
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  feedInformationCard: {
+    padding: "20px",
+    border: "1px solid #cbd5e1",
+    borderRadius: "8px",
+    backgroundColor: "#f8fafc",
+  },
+  instructionsCard: {
+    marginTop: "24px",
+    padding: "20px",
+    border: "1px solid #cbd5e1",
+    borderRadius: "8px",
+  },
+  sectionHeading: {
+    marginTop: 0,
+    fontSize: "20px",
+  },
+  fieldSection: {
+    marginTop: "20px",
+  },
+  fieldLabel: {
+    marginBottom: "6px",
+    fontSize: "14px",
+    fontWeight: 600,
+  },
+  fieldDescription: {
+    marginTop: 0,
+  },
+  inputLabel: {
+    display: "block",
+    marginBottom: "6px",
+    fontSize: "14px",
+    fontWeight: 600,
+  },
+  input: {
+    width: "100%",
+    boxSizing: "border-box",
+    padding: "12px",
+    border: "1px solid #94a3b8",
+    borderRadius: "8px",
+    backgroundColor: "#ffffff",
+    fontSize: "16px",
+  },
+  passwordButtonRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "10px",
+    marginTop: "12px",
+  },
+  compactButton: {
+    padding: "10px 14px",
+  },
+  statusMessage: {
+    marginBottom: 0,
+    color: "#334155",
+    fontSize: "14px",
+  },
+  errorMessage: {
+    marginBottom: 0,
+    color: "#b91c1c",
+    fontSize: "14px",
+  },
+  instructionsList: {
+    paddingLeft: "22px",
+    lineHeight: 1.7,
+  },
+  navigationButtonRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "16px",
+    marginTop: "32px",
+  },
+};

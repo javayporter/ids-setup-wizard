@@ -1,3 +1,4 @@
+import { PrimaryButton, SecondaryButton } from "../components/Button";
 import WizardLayout from "../components/WizardLayout";
 
 import type { IdsLocation } from "../../../shared/types/api.types";
@@ -29,14 +30,8 @@ export default function DealerLocationsPage({
       }
       maxWidth="620px"
     >
-      <section
-        style={{
-          padding: "16px",
-          border: "1px solid #cbd5e1",
-          borderRadius: "8px",
-        }}
-      >
-        <h2 style={{ marginTop: 0, fontSize: "18px" }}>Main location</h2>
+      <section style={styles.mainLocationCard}>
+        <h2 style={styles.mainLocationHeading}>Main location</h2>
 
         <p>
           <strong>Name:</strong> {mainLocation.Name}
@@ -47,7 +42,7 @@ export default function DealerLocationsPage({
         </p>
       </section>
 
-      <h2 style={{ marginTop: "28px", fontSize: "20px" }}>All locations</h2>
+      <h2 style={styles.allLocationsHeading}>All locations</h2>
 
       <ul>
         {locations.map((location) => (
@@ -57,45 +52,37 @@ export default function DealerLocationsPage({
         ))}
       </ul>
 
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          gap: "16px",
-          marginTop: "24px",
-        }}
-      >
-        <button
-          type="button"
-          onClick={onBack}
-          style={{
-            padding: "12px 18px",
-            border: "1px solid #64748b",
-            borderRadius: "8px",
-            backgroundColor: "#ffffff",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
+      <div style={styles.buttonRow}>
+        <SecondaryButton type="button" onClick={onBack}>
           Back
-        </button>
+        </SecondaryButton>
 
-        <button
-          type="button"
-          onClick={onContinue}
-          style={{
-            padding: "12px 18px",
-            border: "none",
-            borderRadius: "8px",
-            backgroundColor: "#2563eb",
-            color: "#ffffff",
-            fontWeight: 600,
-            cursor: "pointer",
-          }}
-        >
+        <PrimaryButton type="button" onClick={onContinue}>
           Continue
-        </button>
+        </PrimaryButton>
       </div>
     </WizardLayout>
   );
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  mainLocationCard: {
+    padding: "16px",
+    border: "1px solid #cbd5e1",
+    borderRadius: "8px",
+  },
+  mainLocationHeading: {
+    marginTop: 0,
+    fontSize: "18px",
+  },
+  allLocationsHeading: {
+    marginTop: "28px",
+    fontSize: "20px",
+  },
+  buttonRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: "16px",
+    marginTop: "24px",
+  },
+};

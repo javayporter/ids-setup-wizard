@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { PrimaryButton } from "../components/Button";
 import WizardLayout from "../components/WizardLayout";
 import { startSetup } from "../services/api";
 
@@ -124,17 +125,13 @@ export default function DealerInformationPage({
           </div>
         )}
 
-        <button
+        <PrimaryButton
           type="submit"
           disabled={isLoading || isFormIncomplete}
-          style={{
-            ...styles.button,
-            opacity: isLoading || isFormIncomplete ? 0.6 : 1,
-            cursor: isLoading || isFormIncomplete ? "not-allowed" : "pointer",
-          }}
+          aria-busy={isLoading}
         >
           {isLoading ? "Starting setup..." : "Next: Retrieve Locations"}
-        </button>
+        </PrimaryButton>
       </form>
     </WizardLayout>
   );
@@ -168,14 +165,5 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: "8px",
     backgroundColor: "#fee2e2",
     color: "#991b1b",
-  },
-  button: {
-    padding: "13px 18px",
-    border: "none",
-    borderRadius: "8px",
-    backgroundColor: "#1f2937",
-    color: "#ffffff",
-    fontSize: "16px",
-    fontWeight: 600,
   },
 };
