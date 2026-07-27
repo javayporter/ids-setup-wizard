@@ -1,0 +1,89 @@
+.feedInformationCard {
+  padding: 20px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background-color: #f8fafc;
+}
+
+.instructionsCard {
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.sectionHeading {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.fieldSection {
+  margin-top: 20px;
+}
+
+.fieldLabel {
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.fieldDescription {
+  margin-top: 0;
+}
+
+.inputLabel {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #94a3b8;
+  border-radius: 8px;
+  background-color: #ffffff;
+  font-size: 16px;
+}
+
+.passwordInput {
+  font-family: monospace;
+  letter-spacing: 1px;
+}
+
+.passwordButtonRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.compactButton {
+  padding: 10px 14px;
+}
+
+.statusMessage {
+  margin-bottom: 0;
+  color: #334155;
+  font-size: 14px;
+}
+
+.errorMessage {
+  margin-bottom: 0;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.instructionsList {
+  padding-left: 22px;
+  line-height: 1.7;
+}
+
+.navigationButtonRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 32px;
+}

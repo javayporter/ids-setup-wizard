@@ -1,7 +1,8 @@
+import type { IdsLocation } from "../../../shared/types/api.types";
 import { PrimaryButton, SecondaryButton } from "../components/Button";
 import WizardLayout from "../components/WizardLayout";
 
-import type { IdsLocation } from "../../../shared/types/api.types";
+import styles from "./DealerLocationsPage.module.css";
 
 interface DealerLocationsPageProps {
   dealershipName: string;
@@ -30,8 +31,8 @@ export default function DealerLocationsPage({
       }
       maxWidth="620px"
     >
-      <section style={styles.mainLocationCard}>
-        <h2 style={styles.mainLocationHeading}>Main location</h2>
+      <section className={styles.mainLocationCard}>
+        <h2 className={styles.mainLocationHeading}>Main location</h2>
 
         <p>
           <strong>Name:</strong> {mainLocation.Name}
@@ -42,7 +43,7 @@ export default function DealerLocationsPage({
         </p>
       </section>
 
-      <h2 style={styles.allLocationsHeading}>All locations</h2>
+      <h2 className={styles.allLocationsHeading}>All locations</h2>
 
       <ul>
         {locations.map((location) => (
@@ -52,7 +53,7 @@ export default function DealerLocationsPage({
         ))}
       </ul>
 
-      <div style={styles.buttonRow}>
+      <div className={styles.buttonRow}>
         <SecondaryButton type="button" onClick={onBack}>
           Back
         </SecondaryButton>
@@ -64,25 +65,3 @@ export default function DealerLocationsPage({
     </WizardLayout>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  mainLocationCard: {
-    padding: "16px",
-    border: "1px solid #cbd5e1",
-    borderRadius: "8px",
-  },
-  mainLocationHeading: {
-    marginTop: 0,
-    fontSize: "18px",
-  },
-  allLocationsHeading: {
-    marginTop: "28px",
-    fontSize: "20px",
-  },
-  buttonRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: "16px",
-    marginTop: "24px",
-  },
-};

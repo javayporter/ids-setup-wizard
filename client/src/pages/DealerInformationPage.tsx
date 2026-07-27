@@ -1,10 +1,12 @@
 import { useState } from "react";
 
+import type { StartSetupResult } from "../../../shared/types/api.types";
 import { PrimaryButton } from "../components/Button";
 import WizardLayout from "../components/WizardLayout";
+import { ApiError } from "../errors/ApiError";
 import { startSetup } from "../services/api";
 
-import type { StartSetupResult } from "../../../shared/types/api.types";
+import styles from "./DealerInformation.module.css";
 
 interface DealerInformationPageProps {
   onSetupStarted: (result: StartSetupResult) => void;
@@ -49,20 +51,17 @@ export default function DealerInformationPage({
         clientId: trimmedClientId,
       });
 
-      // Send the safe setup result to App.tsx.
-      // App.tsx can store the session ID and move to the locations screen.
+      // Send the safe setup result to the wizard state hook.
+      // The hook stores the session details and advances to the locations page.
       onSetupStarted(response.data);
     } catch (error) {
-      // The backend currently returns structured error JSON.
-      // We check for a message before falling back to a generic error.
-      if (
-        typeof error === "object" &&
-        error !== null &&
-        "message" in error &&
-        typeof error.message === "string"
-      ) {
+      if (error instanceof ApiError) {
+        console.error("Setup API request failed:", error);
+
         setErrorMessage(error.message);
       } else {
+        console.error("Unexpected setup request error:", error);
+
         setErrorMessage("Unable to start the setup session.");
       }
     } finally {
@@ -79,9 +78,9 @@ export default function DealerInformationPage({
       description="Enter the dealership information provided for this IDS integration."
       maxWidth="520px"
     >
-      <form onSubmit={handleSubmit} style={styles.form}>
-        <div style={styles.fieldGroup}>
-          <label htmlFor="dealershipName" style={styles.label}>
+      <form onSubmit={handleSubmit} className={styles.form}>
+        <div className={styles.fieldGroup}>
+          <label htmlFor="dealershipName" className={styles.label}>
             Dealership name
           </label>
 
@@ -93,12 +92,12 @@ export default function DealerInformationPage({
             placeholder="Southwind RV"
             autoComplete="organization"
             disabled={isLoading}
-            style={styles.input}
+            className={styles.input}
           />
         </div>
 
-        <div style={styles.fieldGroup}>
-          <label htmlFor="clientId" style={styles.label}>
+        <div className={styles.fieldGroup}>
+          <label htmlFor="clientId" className={styles.label}>
             IDS Client ID
           </label>
 
@@ -110,17 +109,17 @@ export default function DealerInformationPage({
             placeholder="Enter the IDS Client ID"
             autoComplete="off"
             disabled={isLoading}
-            style={styles.input}
+            className={styles.input}
           />
 
-          <small style={styles.helpText}>
+          <small className={styles.helpText}>
             The Client ID is sent securely to the backend and is not displayed
             after setup begins.
           </small>
         </div>
 
         {errorMessage && (
-          <div role="alert" style={styles.error}>
+          <div role="alert" className={styles.error}>
             {errorMessage}
           </div>
         )}
@@ -136,34 +135,3 @@ export default function DealerInformationPage({
     </WizardLayout>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  form: {
-    display: "grid",
-    gap: "20px",
-  },
-  fieldGroup: {
-    display: "grid",
-    gap: "8px",
-  },
-  label: {
-    fontWeight: 600,
-  },
-  input: {
-    width: "100%",
-    boxSizing: "border-box",
-    padding: "12px",
-    border: "1px solid #cbd5e1",
-    borderRadius: "8px",
-    fontSize: "16px",
-  },
-  helpText: {
-    lineHeight: 1.4,
-  },
-  error: {
-    padding: "12px",
-    borderRadius: "8px",
-    backgroundColor: "#fee2e2",
-    color: "#991b1b",
-  },
-};

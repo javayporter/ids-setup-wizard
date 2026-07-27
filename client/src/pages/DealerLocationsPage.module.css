@@ -1,0 +1,22 @@
+.mainLocationCard {
+  padding: 16px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+}
+
+.mainLocationHeading {
+  margin-top: 0;
+  font-size: 18px;
+}
+
+.allLocationsHeading {
+  margin-top: 28px;
+  font-size: 20px;
+}
+
+.buttonRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 24px;
+}
